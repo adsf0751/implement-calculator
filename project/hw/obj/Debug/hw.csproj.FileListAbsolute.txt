@@ -1,0 +1,16 @@
+C:\Users\adsf0\Desktop\homework\hw\hw\bin\Debug\hw.dll
+C:\Users\adsf0\Desktop\homework\hw\hw\bin\Debug\hw.pdb
+C:\Users\adsf0\Desktop\homework\hw\hw\obj\Debug\hw.csprojAssemblyReference.cache
+C:\Users\adsf0\Desktop\homework\hw\hw\obj\Debug\hw.UserControl1.resources
+C:\Users\adsf0\Desktop\homework\hw\hw\obj\Debug\hw.csproj.GenerateResource.cache
+C:\Users\adsf0\Desktop\homework\hw\hw\obj\Debug\hw.csproj.CoreCompileInputs.cache
+C:\Users\adsf0\Desktop\homework\hw\hw\obj\Debug\hw.dll
+C:\Users\adsf0\Desktop\homework\hw\hw\obj\Debug\hw.pdb
+C:\Users\adsf0\Desktop\homework\project\hw\bin\Debug\hw.dll
+C:\Users\adsf0\Desktop\homework\project\hw\bin\Debug\hw.pdb
+C:\Users\adsf0\Desktop\homework\project\hw\obj\Debug\hw.csprojAssemblyReference.cache
+C:\Users\adsf0\Desktop\homework\project\hw\obj\Debug\hw.UserControl1.resources
+C:\Users\adsf0\Desktop\homework\project\hw\obj\Debug\hw.csproj.GenerateResource.cache
+C:\Users\adsf0\Desktop\homework\project\hw\obj\Debug\hw.csproj.CoreCompileInputs.cache
+C:\Users\adsf0\Desktop\homework\project\hw\obj\Debug\hw.dll
+C:\Users\adsf0\Desktop\homework\project\hw\obj\Debug\hw.pdb
