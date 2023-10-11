@@ -8,13 +8,12 @@ namespace hw
     {
         String? num1, num2, num3;
         String? op1, op2, op3;
-        string str = "";
-        string prev = "";
-        double result = 0;
-        string input = "";
-        bool point = false;
-        string last = "";
-        string expression = "";
+        string str ;
+        string prev ;
+        double result ;
+        string input;
+        string last;
+        string expression;
         public UserControl1()
         {
             InitializeComponent();
@@ -28,7 +27,7 @@ namespace hw
             prev = "";
             result = 0;
             input = "";
-            point = false;
+
             expression = "";
             button14.Enabled = true;
         }
@@ -138,12 +137,9 @@ namespace hw
             {
                 button14.Enabled = false;
             }
-            str += temp;//這個方法都是數字不用特定判斷一次
+            str += temp;
             label1.Text = str;
             Print();
-
-
-
 
         }
 
@@ -157,12 +153,6 @@ namespace hw
         private void button_ops(object sender, EventArgs e)
         {
 
-
-
-
-
-
-
             button14.Enabled = true;
             Print();
             Button btn = (Button)sender;
@@ -170,23 +160,20 @@ namespace hw
             input += temp;
             label2.Text = input;
             last = str;
-            if (str != "")
+            if (num1 == null)
             {
-                if (num1 == null)
-                {
-                    num1 = str;
-                    str = "";
-                }
-                else if (num2 == null)
-                {
-                    num2 = str;
-                    str = "";
-                }
-                else if (num3 == null)
-                {
-                    num3 = str;
-                    str = "";
-                }
+                num1 = str;
+                str = "";
+            }
+            else if (num2 == null)
+            {
+                num2 = str;
+                str = "";
+            }
+            else if (num3 == null)
+            {
+                num3 = str;
+                str = "";
             }
 
             if (prev == null)
@@ -225,25 +212,8 @@ namespace hw
             }
             Print();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             if (num1 != null && num2 != null && num3 != null && op1 != null && op2 != null && op3 != null)
             {
-
                 if (op1 == "+" || op1 == "-")
                 {
                     if (op2 == "*" || op2 == "/")
@@ -326,8 +296,6 @@ namespace hw
         }
         void Count(string num1, string num2, string op)
         {
-
-
             switch (op)
             {
 
@@ -348,7 +316,6 @@ namespace hw
                     catch (DivideByZeroException e)
                     {
                         label1.Text = "錯誤";
-
                     }
                     break;
             }
@@ -382,7 +349,6 @@ namespace hw
                 result = doubleValue;//將123.0改成123
             }
         }
-
 
     }
 }
