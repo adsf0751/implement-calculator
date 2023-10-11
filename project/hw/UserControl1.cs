@@ -4,10 +4,10 @@ using System.Windows.Forms;
 
 namespace hw
 {
-    public partial class UserControl1: UserControl
+    public partial class UserControl1 : UserControl
     {
         String? num1, num2, num3;
-        String? op1, op2,op3;
+        String? op1, op2, op3;
         string str = "";
         string prev = "";
         double result = 0;
@@ -41,9 +41,9 @@ namespace hw
         {
             Print();
             //按數字完接著按等號  number= ，result = number
-            if(op2 ==null)
+            if (op2 == null)
             {
-                if(op1==null)
+                if (op1 == null)
                 {
                     bool isInteger = int.TryParse(input, out int intValue);
                     if (isInteger)
@@ -55,14 +55,14 @@ namespace hw
                 else
                 {
                     //case: 1+2 or 1+
-                    if(str != "")
+                    if (str != "")
                     {
                         //1+2
                         num2 = str;
                         Count(num1, num2, op1);
 
                     }
-                    if(num2 ==null)
+                    if (num2 == null)
                     {
                         //1+
                         Count(num1, op1[0]);
@@ -73,7 +73,7 @@ namespace hw
             }
             else
             {
-                if(str !="")
+                if (str != "")
                 {
                     //       1+2+3
                     if (op1 == "+" || op2 == "-")
@@ -124,16 +124,6 @@ namespace hw
 
             init();
         }
-        void CalculateExpression(string expression)
-        {
-            
-            DataTable table = new DataTable();
-            table.Columns.Add("expression", typeof(string), expression);
-
-            DataRow row = table.NewRow();
-            table.Rows.Add(row);
-            result = Convert.ToDouble(row["expression"]);
-        }
         private void button_number(object sender, EventArgs e)
         {
 
@@ -144,13 +134,17 @@ namespace hw
             prev = null;
             Print();
 
-            if(temp == ".")
+            if (temp == ".")
             {
                 button14.Enabled = false;
             }
             str += temp;//這個方法都是數字不用特定判斷一次
-            
+            label1.Text = str;
             Print();
+
+
+
+
         }
 
         private void reset(object sender, EventArgs e)
@@ -162,6 +156,12 @@ namespace hw
 
         private void button_ops(object sender, EventArgs e)
         {
+
+
+
+
+
+
 
             button14.Enabled = true;
             Print();
@@ -189,15 +189,15 @@ namespace hw
                 }
             }
 
-            if(prev ==null)
+            if (prev == null)
             {
-                    
-                if(op1 == null)
+
+                if (op1 == null)
                 {
                     op1 = temp;
                     prev = "op1";
                 }
-                else if(op2 == null)
+                else if (op2 == null)
                 {
                     op2 = temp;
                     prev = "op2";
@@ -210,29 +210,45 @@ namespace hw
             }
             else
             {
-                if(prev =="op1")
+                if (prev == "op1")
                 {
                     op1 = temp;
                 }
-                if(prev =="op2")
+                if (prev == "op2")
                 {
                     op2 = temp;
                 }
-                if(prev == "op3")
+                if (prev == "op3")
                 {
                     op3 = temp;
                 }
             }
             Print();
 
-            if (num1 != null && num2 != null && num3 != null && op1 !=null && op2 !=null &&  op3 !=null)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            if (num1 != null && num2 != null && num3 != null && op1 != null && op2 != null && op3 != null)
             {
 
-                if(op1 == "+" || op1=="-")
+                if (op1 == "+" || op1 == "-")
                 {
                     if (op2 == "*" || op2 == "/")
                     {
-                        
+
                         Count(num2, num3, op2);
                         num2 = result.ToString();
                         num3 = null;
@@ -254,7 +270,7 @@ namespace hw
                     Print();
 
                 }
-                else if(op1 == "*" || op1 =="/")
+                else if (op1 == "*" || op1 == "/")
                 {
                     Count(num1, num2, op1);
                     num1 = result.ToString();
@@ -263,23 +279,55 @@ namespace hw
                     op1 = op2;
                     op2 = op3;
                     op3 = null;
-                    prev ="op2";
+                    prev = "op2";
                     Print();
 
                 }
                 label1.Text = result.ToString();
             }
 
+            if (op1 != null && op2 != null)
+            {
+                if (op1 == "+" || op1 == "-")
+                {
+                    if (op2 == "+" || op2 == "-")
+                    {
+                        Count(num1, num2, op1);
+                        label1.Text = result.ToString();
+                    }
+                    else
+                    {
+
+                        // 1+2*3+
+                        if (op3 != null)
+                        {
+                            Count(num2, num3, op2);
+                            label1.Text = result.ToString();
+                        }
+                        else
+                        {
+                            label1.Text = num2;
+                        }
+                    }
+                }
+                else
+                {
+                    Count(num1, num2, op1);
+                    label1.Text = result.ToString();
+                }
+            }
+
+
         }
-        void  Print()
+        void Print()
         {
-            label3.Text = "num1 : " + num1 + "\n op1 : " + op1 + "\n num2 : " + num2 + "\n op2 : " + op2 + "\n num3 : " + num3 + "\n op3 :" + op3 + "\n prev: " + prev + "\n最後還在輸入的值:" +str+"\n 倒數的數值" + last;
+            label3.Text = "num1 : " + num1 + "\n op1 : " + op1 + "\n num2 : " + num2 + "\n op2 : " + op2 + "\n num3 : " + num3 + "\n op3 :" + op3 + "\n prev: " + prev + "\n最後還在輸入的值:" + str + "\n 倒數的數值" + last;
             expression = num1 + op1 + num2 + op2 + num3 + op3;
         }
-        void Count(string num1 ,string num2 ,string op)
+        void Count(string num1, string num2, string op)
         {
-            
-            
+
+
             switch (op)
             {
 
@@ -293,23 +341,23 @@ namespace hw
                     result = double.Parse(num1) * double.Parse(num2);
                     break;
                 case "/":
-                    try 
+                    try
                     {
                         result = double.Parse(num1) / double.Parse(num2);
                     }
                     catch (DivideByZeroException e)
                     {
                         label1.Text = "錯誤";
-                    
+
                     }
                     break;
             }
-            if(double.TryParse(result.ToString(), out double doubleValue))
+            if (double.TryParse(result.ToString(), out double doubleValue))
             {
                 result = doubleValue;//將123.0改成123
             }
         }
-        void Count (string num1 , char op)
+        void Count(string num1, char op)
         {
             double num = double.Parse(num1);
             //case1 :one number and one operand  
@@ -335,10 +383,9 @@ namespace hw
             }
         }
 
-        
+
     }
 }
-
 
 
 
