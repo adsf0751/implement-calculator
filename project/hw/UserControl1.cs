@@ -1,25 +1,25 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
-
+//issue: 輸入+/- 
 namespace hw
 {
     public partial class UserControl1 : UserControl
     {
         String num1, num2, num3;
         String op1, op2, op3;
-        string str ;
-        string prev ;
-        double result ;
+        string str;
+        string prev;
+        double result;
         string input;
-        string last;
         string expression;
-        bool flag;
+        int flag;
         bool point;
         bool error;
         public UserControl1()
         {
             InitializeComponent();
+            label1.Text = "預設值為0";
             init();
         }
         void init()
@@ -31,13 +31,35 @@ namespace hw
             result = 0;
             input = "";
             error = false;
-            expression = "";
-            flag = true;
+;
+            flag = 0;
             point = false;
+
+        }
+
+        void SetValue()
+        {
+            if (string.IsNullOrEmpty(num1))
+            {
+                num1 = str;
+
+            }
+            else if (string.IsNullOrEmpty(num2))
+            {
+                num2 = str;
+            }
+            else if (string.IsNullOrEmpty(num3))
+            {
+                num3 = str;
+            }
+
+            str = null;
         }
         private void reset(object sender, EventArgs e)
         {
-            label1.Text = "";
+            label1.Text = "預設值為0";
+            label2.Text = "Input: ";
+            label3.Text = "紀錄: ";
             init();
         }
         private void UserControl1_Load(object sender, EventArgs e)
@@ -45,41 +67,65 @@ namespace hw
 
         }
 
-        private void get_result(object sender, EventArgs e)
+        private void Get_result(object sender, EventArgs e)
         {
             Print();
             //按數字完接著按等號  number= ，result = number
-            if (op2 == null)
+            if (string.IsNullOrEmpty(op2))
             {
-                if (op1 == null)
+                if (string.IsNullOrEmpty(op1))
                 {
-                    bool isInteger = int.TryParse(input, out int intValue);
-                    if (isInteger)
+                    if (string.IsNullOrEmpty(num1))
                     {
-                        label1.Text = str;
+                        if(string.IsNullOrEmpty(str))
+                        {
+                            //都沒有輸入值，判斷是否點過(+/-)，不用多一個flag==0判斷。
+                            str = (flag % 2 == 0) ? "0" : "-0";
+                        }
+                        else
+                        {
+                            str = (flag % 2 == 0) ? str : "-"+str;
+                        }
                     }
+
                     label1.Text = str;
                 }
-                else
+                else //op1有值
                 {
-                    //case: 1+2 or 1+
-                    if (str != "")
+                    if (string.IsNullOrEmpty(num2))
                     {
-                        //1+2
-                        num2 = str;
-                        Count(num1, num2, op1);
+                        if (string.IsNullOrEmpty(str))
+                        {
+                            if (string.IsNullOrEmpty(num1))
+                            {
+                                //僅輸入+-*/
+                                label1.Text = "0";
+                            }
+                            else
+                            {   //num1 op1
+                                if (num1 == "-0")
+                                {
+                                    label1.Text = "0";
+                                }
+                                else
+                                {
+                                    Count(num1, num1, op1);
 
-                    }
-                    if (num2 == null)
-                    {
-                        Count(num1, op1[0]);
+                                }
+                            }
+                        }
+                        else
+                        { //num1 op1 str
+                            str = (flag % 2 == 0) ? str : "-" + str;
+                            Count(num1, str, op1);
+                        }
                     }
                     label1.Text = (error) ? "錯誤" : result.ToString();
                 }
             }
             else
             {
-                if (str != "")
+                if (!(string.IsNullOrEmpty(str)))
                 {
                     //       1+2+3
                     if (op1 == "+" || op2 == "-")
@@ -104,30 +150,33 @@ namespace hw
 
                 }
                 else
-                {       //     1+2+
-                    if (op1 == "+" || op2 == "-")
+                {
+                    //     1+2+
+                    if (op1 == "+" || op1 == "-")
                     {
                         if (op2 == "*" || op2 == "/")
                         {
-                            Count(num2, op2[0]);
+                            Count(num2, num2,op2);
                             Count(result.ToString(), num1, op1);
                         }
                         else
                         {
                             Count(num1, num2, op1);
-                            Count(result.ToString(), op2[0]);
+                            Count(result.ToString(), result.ToString(), op2);
                         }
 
                     }
                     else
                     {
                         Count(num1, num2, op1);
-                        Count(result.ToString(), op2[0]);
+                        Count(result.ToString(), result.ToString(), op2);
                     }
                 }
                 label1.Text = (error) ? "錯誤" : result.ToString();
             }
 
+            label2.Text = "Input: ";
+            //label3.Text = "紀錄: ";
             init();
         }
         private void button_number(object sender, EventArgs e)
@@ -135,91 +184,90 @@ namespace hw
 
             Button btn = (Button)sender;
             string temp = btn.Text;
-            
-            input += ( (temp == "+/-")? "(-)" : temp);
+
+            input += ((temp == "+/-") ? "(-)" : temp);
             label2.Text = input;
+
+
+
+
+
+
             prev = null;
             Print();
-            if(temp == "+/-")
+            if (temp == "+/-")
             {
-                flag = !flag;
+                flag++;
+                if (string.IsNullOrEmpty(str))
+                {
+                    label1.Text = (flag % 2 == 0) ? "0" : "-0";
+                }
+                else
+                {
+                    label1.Text = (flag % 2 == 0) ? str : ("-" + str);
+                }
                 return;
             }
-            if(temp == ".")
+            if (temp == ".")
             {
-                if(!point)
+                if (!point)
                 {
                     point = true;
                     str += temp;
                     label1.Text = str;
                     Print();
-                    return;
+                   
                 }
-                else
-                {
-                    return;
-                }
+                return;
             }
 
             str += temp;
-            label1.Text = str;
+            if (!(flag % 2 == 0))
+            {
+                label1.Text = "-" + str;
+            }
+            else { label1.Text = str; }
+
             Print();
         }
 
         private void button_ops(object sender, EventArgs e)
         {
             point = false;
-            button14.Enabled = true;
+;
             Print();
             Button btn = (Button)sender;
             string temp = btn.Text;
             input += temp;
             label2.Text = input;
-            last = str;
 
-            if ( !string.IsNullOrEmpty(str))
+
+            if (!string.IsNullOrEmpty(str))
             {
-                if (!flag)
+                if (!(flag % 2 == 0))
                 {
                     string s = str;
                     str = "-";
                     str += s;
                 }
-                if (string.IsNullOrEmpty(num1))
-                {
-                    
-                    num1 = str;
-                    str = "";
-                }
-                else if (string.IsNullOrEmpty(num2))
-                {
-                    num2 = str;
-                    str = "";
-                }
-                else if (string.IsNullOrEmpty(num3))
-                {
-                    num3 = str;
-                    str = "";
-                }
             }
             else
             {
-                flag = true;
-                if(string.IsNullOrEmpty(num1))
+                if (!(flag == 0))
                 {
-                    num1 = "0";
+                    str = (flag % 2 == 0) ? "0" : "-0";
                 }
             }
+            flag = 0;
+            SetValue();
 
             if (string.IsNullOrEmpty(prev))
             {
-
-
                 if (string.IsNullOrEmpty(op1))
                 {
                     op1 = temp;
                     prev = "op1";
-                    
+
                 }
                 else if (string.IsNullOrEmpty(op2))
                 {
@@ -248,12 +296,22 @@ namespace hw
                 }
             }
 
-
+                
+            if (!string.IsNullOrEmpty(op1) && string.IsNullOrEmpty(num1))
+            {
+                num1 = "0";
+            }
 
             Print();
 
 
-            if (num1 != null && num2 != null && num3 != null && op1 != null && op2 != null && op3 != null)
+            if (!(string.IsNullOrEmpty(num1) ) &&
+                !(string.IsNullOrEmpty(num2) ) &&
+                !(string.IsNullOrEmpty(num3) ) &&
+                !(string.IsNullOrEmpty(op1)  ) &&
+                !(string.IsNullOrEmpty(op2)  ) &&
+                !(string.IsNullOrEmpty(op3)  ) 
+               )
             {
                 if (op1 == "+" || op1 == "-")
                 {
@@ -296,8 +354,7 @@ namespace hw
                 }
                 label1.Text = (error) ? "錯誤" : result.ToString();
             }
-
-            if (op1 != null && op2 != null)
+            if( !(string.IsNullOrEmpty(op1)) && !(string.IsNullOrEmpty(op2)) )
             {
                 if (op1 == "+" || op1 == "-")
                 {
@@ -310,7 +367,7 @@ namespace hw
                     {
 
                         // 1+2*3+
-                        if (op3 != null)
+                        if (!(string.IsNullOrEmpty(op3)))
                         {
                             Count(num2, num3, op2);
                             label1.Text = (error) ? "錯誤" : result.ToString();
@@ -332,21 +389,26 @@ namespace hw
         }
         void Print()
         {
-            label3.Text = "num1 : " + num1 + "\n op1 : " + op1 + "\n num2 : " + num2 + "\n op2 : " + op2 + "\n num3 : " + num3 + "\n op3 :" + op3 + "\n prev: " + prev + "\n最後還在輸入的值:" + str + "\n 倒數的數值" + last;
-            expression = num1 + op1 + num2 + op2 + num3 + op3;
+            label3.Text =      "num1 : " + num1 +
+                            "\n op1 : "  + op1  +
+                            "\n num2 : " + num2 +
+                            "\n op2 : "  + op2  +
+                            "\n num3 : " + num3 + 
+                            "\n op3 :"   + op3  + 
+                            "\n prev: "  + prev + 
+                            "\n 最後還在輸入的值:" + str;
         }
         void Count(string num1, string num2, string op)
         {
-            if (num2 == "0" &&  op == "/" ) 
+            //因為/0會執行並顯示結果為無限大符號，故不能用try catch (divide by zero)
+            if (num2 == "0" && op == "/")
             {
                 error = true;
             }
             else
             {
-
                 switch (op)
                 {
-
                     case "+":
                         result = double.Parse(num1) + double.Parse(num2);
                         break;
@@ -368,7 +430,7 @@ namespace hw
         }
         void Count(string num1, char op)
         {
-            if(num1 =="0" && op == '/')
+            if (num1 == "0" && op == '/')
             {
                 error = true;
             }
@@ -397,13 +459,7 @@ namespace hw
                     result = doubleValue;//將123.0改成123
                 }
             }
-
         }
 
     }
 }
-
-
-
-
-
