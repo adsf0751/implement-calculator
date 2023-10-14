@@ -12,7 +12,6 @@ namespace hw
         string prev;
         double result;
         string input;
-        string expression;
         int flag;
         bool point;
         bool error;
@@ -20,6 +19,7 @@ namespace hw
         {
             InitializeComponent();
             label1.Text = "預設值為0";
+            label4.Text = "";
             init();
         }
         void init()
@@ -60,6 +60,7 @@ namespace hw
             label1.Text = "預設值為0";
             label2.Text = "Input: ";
             label3.Text = "紀錄: ";
+            label4.Text = "";
             init();
         }
         private void UserControl1_Load(object sender, EventArgs e)
@@ -67,117 +68,177 @@ namespace hw
 
         }
 
+        bool IsEmpty(string s)
+        {
+            return string.IsNullOrEmpty(s);
+        }
         private void Get_result(object sender, EventArgs e)
         {
-            Print();
-            //按數字完接著按等號  number= ，result = number
-            if (string.IsNullOrEmpty(op2))
+            SetString();
+            SetValue();
+            flag = 0;
+            // =  、 number= 、 (+/-)= 、  op=    
+            // (+/-)op= 、 number op= 、 1+
+            // (+/-)op(+/-)=、number op number= 1+2 
+            // (+/-)op(+/-)op(+/-) 1+2+
+            //1+2+3
+            string getResult = null;
+            if (IsEmpty(op2))
             {
-                if (string.IsNullOrEmpty(op1))
+                if(IsEmpty(op1))
                 {
-                    if (string.IsNullOrEmpty(num1))
+                    if(IsEmpty(num1))
                     {
-                        if(string.IsNullOrEmpty(str))
-                        {
-                            //都沒有輸入值，判斷是否點過(+/-)，不用多一個flag==0判斷。
-                            str = (flag % 2 == 0) ? "0" : "-0";
-                        }
-                        else
-                        {
-                            str = (flag % 2 == 0) ? str : "-"+str;
-                        }
-                    }
+                        //  //only click = 
 
-                    label1.Text = str;
+                        getResult = "0";
+                        //label4.Text = "0";
+                    }
+                    else
+                    {
+                        //click number or (+/-)
+
+                        getResult = num1;
+                        //label4.Text = num1;
+                    }
                 }
-                else //op1有值
+                else
                 {
-                    if (string.IsNullOrEmpty(num2))
-                    {
-                        if (string.IsNullOrEmpty(str))
-                        {
-                            if (string.IsNullOrEmpty(num1))
-                            {
-                                //僅輸入+-*/
-                                label1.Text = "0";
-                            }
-                            else
-                            {   //num1 op1
-                                if (num1 == "-0")
-                                {
-                                    label1.Text = "0";
-                                }
-                                else
-                                {
-                                    Count(num1, num1, op1);
 
-                                }
-                            }
-                        }
-                        else
-                        { //num1 op1 str
-                            str = (flag % 2 == 0) ? str : "-" + str;
-                            Count(num1, str, op1);
-                        }
+                    if(IsEmpty(num2))
+                    {
+                        //click (+/-) or not ， click number or not ， only click op
+                        //因為op1有值，不管有無輸入數值或正負號都會帶一個0
+                        Count(num1, num1, op1);
+                        getResult = error ? "錯誤" : result.ToString();
+                        //label4.Text = getResult;
+                        //label4.Text = "num1:" + num1 + "\n op1 :" + op1;
                     }
-                    label1.Text = (error) ? "錯誤" : result.ToString();
+                    else
+                    {
+                        //1+2
+                        Count(num1, num2, op1);
+                        getResult = error ? "錯誤" : result.ToString();
+                    }
                 }
             }
             else
             {
-                if (!(string.IsNullOrEmpty(str)))
+                if(IsEmpty(num3))
                 {
-                    //       1+2+3
-                    if (op1 == "+" || op2 == "-")
+                    if( op1 =="*" || op1 == "/")
                     {
-                        if (op2 == "*" || op2 == "/")
+                     // 1*2 (+-*/)   
+                        Count(num1, num2, op1);  
+                        if(error)
                         {
-                            Count(num2, str, op2);
-                            Count(num1, result.ToString(), op1);
+                            label1.Text = "錯誤";
+                            label2.Text = "Input: ";
+                            init();
+                            return;
                         }
-                        else
+                        getResult = result.ToString();
+                        Count(getResult, getResult, op2);//op2 的加減乘除都考慮進去了
+                        if (error)
                         {
-                            Count(num1, num2, op1);
-                            Count(result.ToString(), str, op2);
+                            label1.Text = "錯誤";
+                            label2.Text = "Input: ";
+                            init();
+                            return;
                         }
-
+                        getResult = result.ToString();
+                        //label4.Text = "num1:" + num1 + "\n op1 :" + op1 + "\n num2: " + num2 + "\n op2 :" + op2 + "\n getResult:" + getResult;
+                    
                     }
                     else
-                    {
-                        Count(num1, num2, op1);
-                        Count(result.ToString(), str, op2);
-                    }
-
-                }
-                else
-                {
-                    //     1+2+
-                    if (op1 == "+" || op1 == "-")
-                    {
-                        if (op2 == "*" || op2 == "/")
+                    {   //1 (+-) 2  (*/) 
+                        if (op2 =="*" || op2 =="/")
                         {
-                            Count(num2, num2,op2);
-                            Count(result.ToString(), num1, op1);
+                            Count(num2, num2, op2);
+                            if(error)
+                            {
+                                //label4.Text = "錯誤";
+                                label1.Text = "錯誤";
+                                label2.Text = "Input: ";
+                                init();
+                                return;
+                            }
+                            getResult = result.ToString();
+                            Count(num1, getResult, op1);
+                            getResult = result.ToString();
+                            //label4.Text = "num1:" + num1 + "\n op1 :" + op1 + "\n num2: " + num2 + "\n op2 :" + op2 + "\n getResult:" + getResult;
                         }
                         else
                         {
                             Count(num1, num2, op1);
                             Count(result.ToString(), result.ToString(), op2);
+                            getResult = result.ToString();
                         }
+                    }
+                }
+                else
+                {
+                    if(op1 == "*" || op1 =="/")
+                    {   
+                        //1 * 2 (+-*/) 3
+                        Count(num1, num2, op1);
+                        if (error)
+                        {
+                            //label4.Text = "錯誤";
+                            label1.Text = "錯誤";
+                            label2.Text = "Input: ";
+                            init();
+                            return;
+                        }
+                        getResult = result.ToString();
+                        Count(getResult, num3, op2);
+                        if (error)
+                        {
+                            //label4.Text = "錯誤";
+                            label1.Text = "錯誤";
+                            label2.Text = "Input: ";
+                            init();
+                            return;
+                        }
+                        getResult = result.ToString();
+                        /*
+                        label4.Text = "num1:" + num1 + "\n op1 :" + op1 + "\n num2: " + num2 + "\n op2 :" + op2 +
+                            "\n num3: " + num3 +
+                            "\n getResult:" + getResult;
+                        */
 
                     }
                     else
                     {
-                        Count(num1, num2, op1);
-                        Count(result.ToString(), result.ToString(), op2);
+                        //1 (+-) 2 (+-*/) 3
+                        Count(num2, num3, op2);
+                        if (error)
+                        {
+                            //label4.Text = "錯誤";
+                            label1.Text = "錯誤";
+                            label2.Text = "Input: ";
+                            init();
+                            return;
+                        }
+                        getResult = result.ToString();
+                        Count(num1, getResult, op1);
+                        getResult = result.ToString();
+                        /*
+                        label4.Text = "num1:" + num1 + "\n op1 :" + op1 + "\n num2: " + num2 + "\n op2 :" + op2 +
+                            "\n num3: " + num3 +
+                            "\n getResult:" + getResult;
+                        */
                     }
+                    //label4.Text = "num1:" + num1 + "\n op1 :" + op1 + "\n num2: " + num2 + "\n op2 :" + op2 + "\n num3: " + num3;
                 }
-                label1.Text = (error) ? "錯誤" : result.ToString();
             }
 
-            label2.Text = "Input: ";
-            //label3.Text = "紀錄: ";
+            //label4.Text = getResult;
+
+            label1.Text = getResult;
+            //label2.Text = "Input:";
             init();
+
         }
         private void button_number(object sender, EventArgs e)
         {
@@ -187,11 +248,6 @@ namespace hw
 
             input += ((temp == "+/-") ? "(-)" : temp);
             label2.Text = input;
-
-
-
-
-
 
             prev = null;
             Print();
@@ -231,6 +287,40 @@ namespace hw
             Print();
         }
 
+        string   SetString()
+        {
+
+            //存數值的可能，input : (+/-) 、 null 、 (+/-)number 、 number
+            if (flag == 0)//case : 沒有點選(+/-)
+            {
+                if (IsEmpty(str))
+                {
+                    //  
+                    //do nothing ，str = null 
+                    //return str;  
+                }
+                else
+                {
+                    //return str;
+                    // only number
+                }
+            }
+            else //clicked (+/-)
+            {
+                if(IsEmpty(str))
+                {
+                    // (+/-)
+                    str = (flag % 2 == 0) ? "0" : "-0";
+                }
+                else
+                {
+                    //(+/-)number
+                    str = (flag % 2 == 0) ? str : "-"+ str;
+                }
+            }
+            //label4.Text = "Print string value: " + str;
+            return str;
+        }
         private void button_ops(object sender, EventArgs e)
         {
             point = false;
@@ -240,27 +330,9 @@ namespace hw
             string temp = btn.Text;
             input += temp;
             label2.Text = input;
-
-
-            if (!string.IsNullOrEmpty(str))
-            {
-                if (!(flag % 2 == 0))
-                {
-                    string s = str;
-                    str = "-";
-                    str += s;
-                }
-            }
-            else
-            {
-                if (!(flag == 0))
-                {
-                    str = (flag % 2 == 0) ? "0" : "-0";
-                }
-            }
-            flag = 0;
+            SetString();
             SetValue();
-
+            flag = 0;
             if (string.IsNullOrEmpty(prev))
             {
                 if (string.IsNullOrEmpty(op1))
@@ -401,7 +473,7 @@ namespace hw
         void Count(string num1, string num2, string op)
         {
             //因為/0會執行並顯示結果為無限大符號，故不能用try catch (divide by zero)
-            if (num2 == "0" && op == "/")
+            if (double.Parse(num2) == 0.0 && op == "/")
             {
                 error = true;
             }
@@ -428,11 +500,14 @@ namespace hw
                 }
             }
         }
-        void Count(string num1, char op)
+
+        /*        void Count(string num1, char op)
         {
+
             if (num1 == "0" && op == '/')
             {
                 error = true;
+
             }
             else
             {
@@ -459,7 +534,6 @@ namespace hw
                     result = doubleValue;//將123.0改成123
                 }
             }
-        }
-
+        }*/
     }
 }
