@@ -1,11 +1,20 @@
 ﻿using System;
 using System.Data;
+using System.IO;
 using System.Windows.Forms;
-//issue: 輸入+/- 
+//輸入如果是1+2/0 當輸入0，要先判斷輸入完整的0會報錯，但輸入02，要顯示2
 namespace hw
 {
     public partial class UserControl1 : UserControl
     {
+        string filepath = "log.txt";
+        string string_label1_init_value = "預設值為 0";
+        string string_label2_init_value = "Input: ";
+        string string_error = "錯誤";
+        string string_result = "最終結果為:";
+
+
+
         String num1, num2, num3;
         String op1, op2, op3;
         string str;
@@ -15,21 +24,44 @@ namespace hw
         int flag;
         bool point;
         bool error;
+
+
         public UserControl1()
         {
+            
             InitializeComponent();
-            label1.Text = "預設值為0";
-            label4.Text = "";
+            label1.Text = string_label1_init_value ;
+            label4.Text = null;
             init();
+        }
+        public void Append_String_To_File( string Write_String)//網路上的code
+        {
+            Write_String += "\n";
+            if (!File.Exists(filepath))
+            {
+                using (StreamWriter sw = File.CreateText(filepath))
+                {
+                    sw.Write(Write_String);
+                }
+
+            }
+            else
+            {
+                using (StreamWriter sw = File.AppendText(filepath))
+                {
+                    sw.Write(Write_String);
+                }
+
+            }
         }
         void init()
         {
             num1 = num2 = num3 = null;
             op1 = op2 = op3 = null;
-            str = "";
-            prev = "";
+            str = null;
+            prev = null;
             result = 0;
-            input = "";
+            input = null;
             error = false;
 ;
             flag = 0;
@@ -55,12 +87,18 @@ namespace hw
 
             str = null;
         }
+        void GoActionResult()
+        {
+            label1.Text = string_result + string_error;
+            label2.Text = string_label2_init_value;
+            init();
+        }
         private void reset(object sender, EventArgs e)
         {
-            label1.Text = "預設值為0";
-            label2.Text = "Input: ";
+            label1.Text = string_label1_init_value;
+            label2.Text = string_label2_init_value;
             label3.Text = "紀錄: ";
-            label4.Text = "";
+            label4.Text = null;
             init();
         }
         private void UserControl1_Load(object sender, EventArgs e)
@@ -74,6 +112,7 @@ namespace hw
         }
         private void Get_result(object sender, EventArgs e)
         {
+            input += "=";
             SetString();
             SetValue();
             flag = 0;
@@ -132,18 +171,14 @@ namespace hw
                         Count(num1, num2, op1);  
                         if(error)
                         {
-                            label1.Text = "錯誤";
-                            label2.Text = "Input: ";
-                            init();
+                            GoActionResult();
                             return;
                         }
                         getResult = result.ToString();
                         Count(getResult, getResult, op2);//op2 的加減乘除都考慮進去了
                         if (error)
                         {
-                            label1.Text = "錯誤";
-                            label2.Text = "Input: ";
-                            init();
+                            GoActionResult();
                             return;
                         }
                         getResult = result.ToString();
@@ -158,9 +193,7 @@ namespace hw
                             if(error)
                             {
                                 //label4.Text = "錯誤";
-                                label1.Text = "錯誤";
-                                label2.Text = "Input: ";
-                                init();
+                                GoActionResult();
                                 return;
                             }
                             getResult = result.ToString();
@@ -185,9 +218,7 @@ namespace hw
                         if (error)
                         {
                             //label4.Text = "錯誤";
-                            label1.Text = "錯誤";
-                            label2.Text = "Input: ";
-                            init();
+                            GoActionResult();
                             return;
                         }
                         getResult = result.ToString();
@@ -195,9 +226,7 @@ namespace hw
                         if (error)
                         {
                             //label4.Text = "錯誤";
-                            label1.Text = "錯誤";
-                            label2.Text = "Input: ";
-                            init();
+                            GoActionResult();
                             return;
                         }
                         getResult = result.ToString();
@@ -215,9 +244,7 @@ namespace hw
                         if (error)
                         {
                             //label4.Text = "錯誤";
-                            label1.Text = "錯誤";
-                            label2.Text = "Input: ";
-                            init();
+                            GoActionResult();
                             return;
                         }
                         getResult = result.ToString();
@@ -234,9 +261,10 @@ namespace hw
             }
 
             //label4.Text = getResult;
-
-            label1.Text = getResult;
-            //label2.Text = "Input:";
+            label1.Text = string_result + getResult;
+            //label2.Text = string_label2_init_value;
+            input += getResult;
+            Append_String_To_File(input);
             init();
 
         }
@@ -276,7 +304,11 @@ namespace hw
                 }
                 return;
             }
-
+            //str is not null and str= "0"，當輸入除號後 數字0123 轉成123
+            if(!IsEmpty(str) && str.Length==1 && str =="0")
+            {
+                str = null;
+            }
             str += temp;
             if (!(flag % 2 == 0))
             {
@@ -391,6 +423,11 @@ namespace hw
                     {
 
                         Count(num2, num3, op2);
+                        if(error)
+                        {
+                            GoActionResult();
+                            return;
+                        }
                         num2 = result.ToString();
                         num3 = null;
                         op2 = op3;
@@ -400,6 +437,11 @@ namespace hw
                     else if (op2 == "+" || op2 == "-")
                     {
                         Count(num1, num2, op1);
+                        if (error)
+                        {
+                            GoActionResult();
+                            return;
+                        }
                         num1 = result.ToString();
                         num2 = num3;
                         num3 = null;
@@ -414,6 +456,11 @@ namespace hw
                 else if (op1 == "*" || op1 == "/")
                 {
                     Count(num1, num2, op1);
+                    if (error)
+                    {
+                        GoActionResult();
+                        return;
+                    }
                     num1 = result.ToString();
                     num2 = num3;
                     num3 = null;
@@ -424,7 +471,7 @@ namespace hw
                     Print();
 
                 }
-                label1.Text = (error) ? "錯誤" : result.ToString();
+                label1.Text =  result.ToString();
             }
             if( !(string.IsNullOrEmpty(op1)) && !(string.IsNullOrEmpty(op2)) )
             {
@@ -433,7 +480,12 @@ namespace hw
                     if (op2 == "+" || op2 == "-")
                     {
                         Count(num1, num2, op1);
-                        label1.Text = (error) ? "錯誤" : result.ToString();
+                        if (error)
+                        {
+                            GoActionResult();
+                            return;
+                        }
+                        label1.Text =  result.ToString();
                     }
                     else
                     {
@@ -442,7 +494,12 @@ namespace hw
                         if (!(string.IsNullOrEmpty(op3)))
                         {
                             Count(num2, num3, op2);
-                            label1.Text = (error) ? "錯誤" : result.ToString();
+                            if (error)
+                            {
+                                GoActionResult();
+                                return;
+                            }
+                            label1.Text = result.ToString();
                         }
                         else
                         {
@@ -453,7 +510,12 @@ namespace hw
                 else
                 {
                     Count(num1, num2, op1);
-                    label1.Text = (error) ? "錯誤" : result.ToString();
+                    if (error)
+                    {
+                        GoActionResult();
+                        return;
+                    }
+                    label1.Text = result.ToString();
                 }
             }
 
