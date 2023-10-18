@@ -2,16 +2,19 @@
 using System.Data;
 using System.IO;
 using System.Windows.Forms;
-//輸入如果是1+2/0 當輸入0，要先判斷輸入完整的0會報錯，但輸入02，要顯示2
+
 namespace hw
 {
     public partial class UserControl1 : UserControl
     {
         string filepath = "log.txt";
-        string string_label1_init_value = "預設值為 0";
+        string string_label1_init_value = "0";
+        string string_result = "";
+
+        //string string_label1_init_value = "預設值為 0";
         string string_label2_init_value = "Input: ";
         string string_error = "錯誤";
-        string string_result = "最終結果為:";
+        //string string_result = "最終結果為:";
 
 
 
@@ -61,10 +64,9 @@ namespace hw
             str = null;
             prev = null;
             result = 0;
-            input = null;
             error = false;
-;
-            flag = 0;
+
+            //flag = 0;
             point = false;
 
         }
@@ -91,6 +93,8 @@ namespace hw
         {
             label1.Text = string_result + string_error;
             label2.Text = string_label2_init_value;
+            flag = 0;
+            input = null;
             init();
         }
         private void reset(object sender, EventArgs e)
@@ -99,6 +103,8 @@ namespace hw
             label2.Text = string_label2_init_value;
             label3.Text = "紀錄: ";
             label4.Text = null;
+            input = null;
+            flag = 0;
             init();
         }
         private void UserControl1_Load(object sender, EventArgs e)
@@ -112,6 +118,7 @@ namespace hw
         }
         private void Get_result(object sender, EventArgs e)
         {
+            bool only_click_equal = false;
             input += "=";
             SetString();
             SetValue();
@@ -128,8 +135,9 @@ namespace hw
                 {
                     if(IsEmpty(num1))
                     {
-                        //  //only click = 
 
+                        only_click_equal = true;
+                        //  //only click = 
                         getResult = "0";
                         //label4.Text = "0";
                     }
@@ -149,7 +157,12 @@ namespace hw
                         //click (+/-) or not ， click number or not ， only click op
                         //因為op1有值，不管有無輸入數值或正負號都會帶一個0
                         Count(num1, num1, op1);
-                        getResult = error ? "錯誤" : result.ToString();
+                        if (error)
+                        {
+                            GoActionResult();
+                            return;
+                        }
+                        getResult = result.ToString();
                         //label4.Text = getResult;
                         //label4.Text = "num1:" + num1 + "\n op1 :" + op1;
                     }
@@ -157,7 +170,12 @@ namespace hw
                     {
                         //1+2
                         Count(num1, num2, op1);
-                        getResult = error ? "錯誤" : result.ToString();
+                        if (error)
+                        {
+                            GoActionResult();
+                            return;
+                        }
+                        getResult = result.ToString();
                     }
                 }
             }
@@ -239,17 +257,27 @@ namespace hw
                     }
                     else
                     {
-                        //1 (+-) 2 (+-*/) 3
-                        Count(num2, num3, op2);
-                        if (error)
+                        if(op2 =="*" || op2 =="/")
                         {
-                            //label4.Text = "錯誤";
-                            GoActionResult();
-                            return;
+                            Count(num2, num3, op2);//op2 maybe '/' check divide by zero
+                            if (error)
+                            {
+                                //label4.Text = "錯誤";
+                                GoActionResult();
+                                return;
+                            }
+                            Count(num1, result.ToString(), op1);
+                        }
+                        //1 (+-) 2 (+-*/) 3
+                        //confirm op1 == (+-)
+                        else
+                        {
+                            Count(num1, num2, op1);
+                            Count(result.ToString(),num3, op2);
+                            
                         }
                         getResult = result.ToString();
-                        Count(num1, getResult, op1);
-                        getResult = result.ToString();
+
                         /*
                         label4.Text = "num1:" + num1 + "\n op1 :" + op1 + "\n num2: " + num2 + "\n op2 :" + op2 +
                             "\n num3: " + num3 +
@@ -263,10 +291,21 @@ namespace hw
             //label4.Text = getResult;
             label1.Text = string_result + getResult;
             //label2.Text = string_label2_init_value;
+            
             input += getResult;
+            input += only_click_equal ? "=" : "";
             Append_String_To_File(input);
             init();
+            double double_result = double.Parse(getResult);
+            if(double_result == 0.0 || double_result == -0.0)
+            {            
+                return;
+            }
 
+            str = str = getResult.Trim('-'); //正確寫法
+            flag = (double_result > 0.0) ? flag : flag+1;
+            //num1 = getResult;
+            label2.Text = input;
         }
         private void button_number(object sender, EventArgs e)
         {
@@ -288,6 +327,7 @@ namespace hw
                 }
                 else
                 {
+                    //label4.Text = flag.ToString();
                     label1.Text = (flag % 2 == 0) ? str : ("-" + str);
                 }
                 return;
